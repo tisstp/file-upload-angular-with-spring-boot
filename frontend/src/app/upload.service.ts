@@ -5,7 +5,7 @@ import {HttpClient, HttpEventType} from '@angular/common/http';
   providedIn: 'root'
 })
 export class UploadService {
-  private url = '';
+  private url = 'http://localhost:8080/uploadfile/form1';
   private fileTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
   private fileSize = 20 * 1024 * 1024; // bytes
 
@@ -27,24 +27,28 @@ export class UploadService {
     return file.size > this.fileSize;
   }
 
-  postUploadFile(formData: FormData) {
-    this.http.post(this.url, formData, {
-      reportProgress: true,
-      observe: 'events'
-    }).subscribe(event => {
-      // Handle Result
-      if (event.type === HttpEventType.UploadProgress) {
-        console.log('Upload Progress: ' + Math.round(event.loaded / event.total * 100) + '%');
-      } else if (event.type === HttpEventType.Response) {
-        console.log(event);
-      }
-    }, error => {
-      // Handle Error
-      alert('Error: ' + error.status + ' ' + error.statusText);
-      console.error('Error: ', error);
-    }, () => {
-      // 'onCompleted' callback.
-      // No errors, route to new here
+  postUploadFile(formData: FormData): Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.http.post(this.url, formData, {
+        reportProgress: true,
+        observe: 'events'
+      }).subscribe(event => {
+        // Handle Result
+        if (event.type === HttpEventType.UploadProgress) {
+          console.log('Upload Progress: ' + Math.round(event.loaded / event.total * 100) + '%');
+        } else if (event.type === HttpEventType.Response) {
+          console.log(event);
+          resolve(event.body);
+        }
+      }, error => {
+        // Handle Error
+        alert('Error: ' + error.status + ' ' + error.statusText);
+        console.error('Error: ', error);
+        reject(error);
+      }, () => {
+        // 'onCompleted' callback.
+        // No errors, route to new here
+      });
     });
   }
 
