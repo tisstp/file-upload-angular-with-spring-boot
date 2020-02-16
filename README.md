@@ -25,3 +25,8 @@ $ mvn clean spring-boot:run
 
 ## File Example
 +  `frontend/src/assets/`
+
+
+## References
+- [listening to progress events](https://angular.io/guide/http#listening-to-progress-events)
+- [File Upload in Angular 6/7 with Progress Bar Using Web API](https://www.truecodex.com/course/angular-6/file-upload-in-angular-6-7-with-progress-bar-using-web-api)

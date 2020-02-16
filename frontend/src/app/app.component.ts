@@ -41,11 +41,9 @@ export class AppComponent implements OnInit {
       const fd = new FormData();
       fd.append('file', this.selectedFile, this.selectedFile.name);
       this.uploadService.postUploadFile(fd)
-        .then(res => {
+        .subscribe(res => {
           console.log('success component', res);
-          alert('Upload File Success!!!');
-        })
-        .catch(err => {
+        }, err => {
           console.log('error component', err);
         });
     }

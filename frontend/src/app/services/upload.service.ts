@@ -1,5 +1,7 @@
-import { HttpClient, HttpEventType } from '@angular/common/http';
+import { HttpClient, HttpEvent, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { catchError, last, map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -28,29 +30,47 @@ export class UploadService {
     return file.size > this.fileSize;
   }
 
-  postUploadFile(formData: FormData): Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.http.post(this.url, formData, {
-        reportProgress: true,
-        observe: 'events'
-      }).subscribe(event => {
-        // Handle Result
-        if (event.type === HttpEventType.UploadProgress) {
-          console.log('Upload Progress: ' + Math.round(event.loaded / event.total * 100) + '%');
-        } else if (event.type === HttpEventType.Response) {
-          console.log(event);
-          resolve(event.body);
-        }
-      }, error => {
-        // Handle Error
-        alert('Error: ' + error.status + ' ' + error.statusText);
-        console.error('Error: ', error);
-        reject(error);
-      }, () => {
-        // 'onCompleted' callback.
-        // No errors, route to new here
-      });
+  postUploadFile(formData: FormData): Observable<any> {
+    const req = new HttpRequest('POST', this.url, formData, {
+      reportProgress: true
     });
+
+    // The `HttpClient.request` API produces a raw event stream
+    // which includes start (sent), progress, and response events.
+    return this.http.request(req).pipe(
+      map(event => this.getEventMessage(event, formData.get('file') as File)),
+      tap(message => this.showProgress(message)),
+      last(), // return last (completed) message to caller
+      catchError(err => {
+        // Handle Error
+        alert('Error: ' + err.status + ' ' + err.statusText);
+        console.error('Error: ', err);
+        return err;
+      })
+    );
+  }
+
+  /** Return distinct message for sent, upload progress, & response events */
+  private getEventMessage(event: HttpEvent<any>, file: File) {
+    switch (event.type) {
+      case HttpEventType.Sent:
+        return `Uploading file "${file.name}" of size ${file.size}.`;
+
+      case HttpEventType.UploadProgress:
+        // Compute and show the % done:
+        const percentDone = Math.round(100 * event.loaded / event.total);
+        return `File "${file.name}" is ${percentDone}% uploaded.`;
+
+      case HttpEventType.Response:
+        return `File "${file.name}" was completely uploaded!`;
+
+      default:
+        return `File "${file.name}" surprising upload event: ${event.type}.`;
+    }
+  }
+
+  private showProgress(message: any) {
+    console.log('message:', message);
   }
 
   private validateName(name: string): boolean {
