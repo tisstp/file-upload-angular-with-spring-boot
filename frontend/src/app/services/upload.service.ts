@@ -1,10 +1,11 @@
-import {Injectable} from '@angular/core';
-import {HttpClient, HttpEventType} from '@angular/common/http';
+import { HttpClient, HttpEventType } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UploadService {
+
   private url = 'http://localhost:8080/uploadfile/form1';
   private fileTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
   private fileSize = 20 * 1024 * 1024; // bytes
@@ -80,4 +81,5 @@ export class UploadService {
       return false;
     }
   }
+
 }

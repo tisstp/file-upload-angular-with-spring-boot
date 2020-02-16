@@ -1,5 +1,5 @@
-import {Component, OnInit} from '@angular/core';
-import {UploadService} from './upload.service';
+import { Component, OnInit } from '@angular/core';
+import { UploadService } from 'src/app/services/upload.service';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +20,7 @@ export class AppComponent implements OnInit {
   onFileSelected(event) {
     console.log('File Changed: ', event);
     if (event) {
-      this.selectedFile = <File>event.target.files[0];
+      this.selectedFile = event.target.files[0] as File;
     } else {
       this.selectedFile = null;
     }
@@ -50,5 +50,4 @@ export class AppComponent implements OnInit {
         });
     }
   }
-
 }
