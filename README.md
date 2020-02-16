@@ -30,3 +30,13 @@ $ mvn clean spring-boot:run
 ## References
 - [listening to progress events](https://angular.io/guide/http#listening-to-progress-events)
 - [File Upload in Angular 6/7 with Progress Bar Using Web API](https://www.truecodex.com/course/angular-6/file-upload-in-angular-6-7-with-progress-bar-using-web-api)
+
+
+## Postman Example
+
+#### Upload File Basic
+![postman-upload-form1.png](backend/images/postman-upload-form1.png)
+
+
+#### Upload File Object & List
+![postman-upload-list-form.png](backend/images/postman-upload-list-form.png)
