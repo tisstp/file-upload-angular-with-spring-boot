@@ -1,6 +1,6 @@
-import { HttpClient, HttpEvent, HttpEventType, HttpRequest } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpEvent, HttpEventType, HttpRequest } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, last, map, tap } from 'rxjs/operators';
 
 @Injectable({
@@ -40,13 +40,8 @@ export class UploadService {
     return this.http.request(req).pipe(
       map(event => this.getEventMessage(event, formData.get('file') as File)),
       tap(message => this.showProgress(message)),
-      last(), // return last (completed) message to caller
-      catchError(err => {
-        // Handle Error
-        alert('Error: ' + err.status + ' ' + err.statusText);
-        console.error('Error: ', err);
-        return err;
-      })
+      // last(), // return last (completed) message to caller
+      catchError(this.handleError)
     );
   }
 
@@ -59,10 +54,12 @@ export class UploadService {
       case HttpEventType.UploadProgress:
         // Compute and show the % done:
         const percentDone = Math.round(100 * event.loaded / event.total);
-        return `File "${file.name}" is ${percentDone}% uploaded.`;
+        // console.log(`Msg:: File "${file.name}" is ${percentDone}% uploaded.`);
+        return { status: 'progress', message: percentDone };
 
       case HttpEventType.Response:
-        return `File "${file.name}" was completely uploaded!`;
+        // console.log(`Msg:: File "${file.name}" was completely uploaded!`);
+        return event.body;
 
       default:
         return `File "${file.name}" surprising upload event: ${event.type}.`;
@@ -100,6 +97,19 @@ export class UploadService {
       // alert("Invalid date format or File Type!");
       return false;
     }
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    if (error.error instanceof ErrorEvent) {
+      // A client-side or network error occurred. Handle it accordingly.
+      console.error('An error occurred:', error.error.message);
+    } else {
+      // The backend returned an unsuccessful response code.
+      // The response body may contain clues as to what went wrong,
+      console.error(`Backend returned code ${error.status}, ` + `body was: ${error.error}`);
+    }
+    // return an observable with a user-facing error message
+    return throwError('Something bad happened. Please try again later.');
   }
 
 }

@@ -10,6 +10,11 @@
     <legend>{{ title }}</legend>
 
     <br>
+    <div *ngIf="fileUpload.status === 'progress'">
+      <progressbar max="100" [value]="fileUpload.message" type="danger" [striped]="true" [animate]="true"><i>{{fileUpload.message}} / 100</i></progressbar>
+    </div>
+
+    <br>
     <div class="img-box">{{selectedFile?.name}}</div>
 
     <input #fileInput type="file" style="display: none"
@@ -17,6 +22,10 @@
 
     <button (click)="fileInput.click()">Select File</button>
     <button (click)="onUpload()">Upload!</button>
+
+    <br>
+
+    <p>{{ error }}</p>
 
     <br>
   </fieldset>

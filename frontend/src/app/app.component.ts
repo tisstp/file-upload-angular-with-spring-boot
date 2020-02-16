@@ -9,7 +9,8 @@ import { UploadService } from 'src/app/services/upload.service';
 export class AppComponent implements OnInit {
   title = 'File Upload with Spring boot';
   selectedFile: File;
-
+  error: string;
+  fileUpload = { status: '', message: 0, filePath: '' };
 
   constructor(private uploadService: UploadService) { }
 
@@ -30,10 +31,11 @@ export class AppComponent implements OnInit {
     console.log(this.selectedFile);
     if (this.selectedFile == null) {
       console.log('You not Choose file.');
-    } else if (this.uploadService.checkName(this.selectedFile)) {
-      console.log('Invalid file name. [' + this.selectedFile.name + ']');
-    } else if (this.uploadService.checkType(this.selectedFile)) {
-      console.log('Invalid file type. [' + this.selectedFile.type + ']');
+      // todo: check name file, check type file.
+      // } else if (this.uploadService.checkName(this.selectedFile)) {
+      //   console.log('Invalid file name. [' + this.selectedFile.name + ']');
+      // } else if (this.uploadService.checkType(this.selectedFile)) {
+      //   console.log('Invalid file type. [' + this.selectedFile.type + ']');
     } else if (this.uploadService.checkSize(this.selectedFile)) {
       console.log('File size larger than ' + this.uploadService.maxSize + ' bytes. [' + (this.selectedFile.size) + ']');
     } else {
@@ -43,8 +45,10 @@ export class AppComponent implements OnInit {
       this.uploadService.postUploadFile(fd)
         .subscribe(res => {
           console.log('success component', res);
+          this.fileUpload = res;
         }, err => {
           console.log('error component', err);
+          this.error = err;
         });
     }
   }
